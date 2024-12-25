@@ -22,19 +22,19 @@ export type InputValue<
   M extends boolean | undefined,
 > = T extends "file"
   ? M extends true
-    ? FileList | undefined
-    : File | undefined
+  ? FileList | undefined
+  : File | undefined
   : T extends "number"
-    ? number | undefined
-    : string | undefined;
+  ? number | undefined
+  : string | undefined;
 
 export interface InputProps<
   T extends InputType = "text",
   M extends boolean | undefined = undefined,
 > extends Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    "type" | "value" | "multiple"
-  > {
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "type" | "value" | "multiple"
+> {
   type?: T;
   multiple?: M;
   value?: InputValue<T, M>;
