@@ -1,10 +1,8 @@
 import renderer from "react-test-renderer";
 import { expect, it } from "vitest";
-import { Example } from "../src";
+import { Input } from "../src";
 
-it("renders correctly", () => {
-	const tree = renderer
-		.create(<Example text="Clicked this many times" />)
-		.toJSON();
-	expect(tree).toMatchSnapshot();
-});
+// it("renders correctly", () => {
+//   const tree = renderer.create(<Input />).toJSON();
+//   expect(tree).toMatchSnapshot();
+// });

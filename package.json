@@ -1,13 +1,33 @@
 {
-	"name": "typescript-react-package-starter",
-	"description": "",
-	"version": "0.0.0",
-	"author": "",
-	"license": "",
-	"keywords": [],
+	"name": "@alfarizi/react-input",
+	"description": "React input component with typesafe \"type\" prop and \"value\" prop with introducing new props called \"onValueChange\" that can handle typesafe value change",
+	"version": "1.0.1",
+	"author": "Moh Rizal Alfarizi",
+	"license": "MIT",
+	"keywords": [
+		"react",
+		"input",
+		"typescript",
+		"typesafe",
+		"value",
+		"onValueChange",
+		"number",
+		"string",
+		"boolean",
+		"date",
+		"datetime-local",
+		"email",
+		"month",
+		"password",
+		"search",
+		"tel",
+		"time",
+		"url",
+		"week"
+	],
 	"repository": {
 		"type": "git",
-		"url": ""
+		"url": "https://github.com/alfariiizi/react-input"
 	},
 	"scripts": {
 		"dev": "concurrently \"pnpm build --watch\" \"pnpm storybook\" \"pnpm test\" ",
@@ -86,12 +106,15 @@
 		"vitest": "2.1.8"
 	},
 	"peerDependencies": {
-		"react": ">=17",
-		"react-dom": ">=17"
+		"react": ">=18",
+		"react-dom": ">=18"
 	},
 	"pnpm": {
 		"overrides": {
 			"micromatch@<4.0.8": ">=4.0.8"
 		}
+	},
+	"dependencies": {
+		"@alfarizi/convert-to-number": "^1.0.5"
 	}
 }
