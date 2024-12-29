@@ -1,20 +1,31 @@
 # @alfarizi/react-input
 
-A highly flexible and type-safe React input component that supports multiple
-input types, including `file`, `number`, and `tel`, with extended customization
-options and strong TypeScript support.
+A highly customizable, type-safe, and strict React input component. It
+simplifies form handling with enhanced DX (Developer Experience).
+
+> Note: If you use this component in Nextjs App Dir, you only can use this
+> component in client component.
+
+## Demo
+
+- React-input demo:
+  [Demo](https://reactjs-components-five.vercel.app/?path=/docs/input-primitive--docs)
+- You can also wrap this component to create your custom style component. You
+  can see the example result in here:
+  [Input Customization Demo](https://reactjs-components-five.vercel.app/?path=/docs/input--docs)
 
 ## Features
 
-- Supports all standard HTML input types (`text`, `number`, `email`, `file`,
-  etc.).
-- Strong TypeScript typing for `value` and `onValueChange`.
-- Custom handling for `file`, `number`, and `tel` input types.
-- Provides default and optional props for better flexibility.
+- **Type Safety**: The `value` and `onValueChange` props are strictly typed
+  based on the `type` prop.
+- **Strict Handling**: Automatically converts empty strings to `undefined`.
+- **Trimming**: Optional `trim` prop to trim string values.
+- **File Input**: Handles single and multiple file uploads.
+- **Number Input**: Returns `number | undefined` for numeric input types.
+- **Tel Input**: Validates common phone number formats.
+- **Customizable**: Easily styled and extended.
 
 ## Installation
-
-Install the package using npm or yarn:
 
 ```bash
 npm install @alfarizi/react-input
@@ -26,127 +37,268 @@ or
 yarn add @alfarizi/react-input
 ```
 
+or
+
+```bash
+pnpm add @alfarizi/react-input
+```
+
+or
+
+```bash
+bun add @alfarizi/react-input
+```
+
+## Motivation
+
+### First Reason
+
+The default `onChange` prop often falls short in terms of developer experience.
+To address this, I introduced a custom `onValueChange` prop, which provides a
+strictly typed `value` parameter based on the `type` prop. For example:
+
+- For `type="number"`, it uses my package:
+  [@alfarizi/convert-to-number](https://www.npmjs.com/package/@alfarizi/convert-to-number)
+  to convert strings to numbers.
+- For `type="file"`, it ensures type-safe handling of file inputs.
+- For `type="tel"`, it validates input based on common phone number formats.
+
+This improves DX and ensures robust handling of various input types.
+
+### Second Reason
+
+I frequently use
+[Shadcn components for creating forms](https://ui.shadcn.com/docs/components/form),
+often in combination with `react-hook-form` and `zod`. When defining a required
+string in a Zod schema, I often write:
+
+```javascript
+z.string().trim().min(1);
+```
+
+By default, empty input fields are treated as empty strings. Because this
+component will return "undefined" if the string is empty, and by default this
+component will trim the value, you can simplify the schema to:
+
+```javascript
+z.string(); // to require a string
+```
+
+### Third Reason
+
+Handling numbers in forms can be tricky. A common client-side validation error I
+encounter is: _"expected number but received string"._ In Zod, this can be
+addressed using:
+
+```javascript
+z.coerce.number().optional();
+```
+
+However, another issue arises. If the input is an empty string (`""`), Zod's
+coercion converts it to `0`. I don't want to submit `0`; I want to submit
+`undefined` or `null`.
+
+With this component, the `onValueChange` prop receives `number | undefined` for
+numeric input types. If the input is empty, it is treated as `undefined`. When
+passing this to `z.coerce.number().optional()`, the result is `null`. If you
+prefer `undefined` over `null`, you can use my other package:
+[@alfarizi/convert-undefined-null](https://www.npmjs.com/package/@alfarizi/convert-undefined-null)
+to convert between `null` and `undefined`.
+
 ## Usage
 
-### Basic Usage
+### Basic Example
 
 ```tsx
 import React, { useState } from "react";
 import { Input } from "@alfarizi/react-input";
 
 const App = () => {
-  const [textValue, setTextValue] = useState<string | undefined>("");
+  const [value, setValue] = useState<string | undefined>(undefined);
 
   return (
-    <div>
-      <Input
-        type="text"
-        value={textValue}
-        onValueChange={setTextValue}
-        placeholder="Enter text"
-      />
-    </div>
+    <Input
+      type="text"
+      value={value}
+      onValueChange={setValue}
+      placeholder="Enter your text"
+    />
   );
 };
 
 export default App;
 ```
 
-### Handling Numbers
+### Number Input Example
 
 ```tsx
 import React, { useState } from "react";
 import { Input } from "@alfarizi/react-input";
 
-const App = () => {
-  const [numberValue, setNumberValue] = useState<number | undefined>(undefined);
+const NumberInput = () => {
+  const [value, setValue] = useState<number | undefined>(undefined);
 
   return (
-    <div>
-      <Input
-        type="number"
-        value={numberValue}
-        onValueChange={setNumberValue}
-        placeholder="Enter a number"
-      />
-    </div>
+    <Input
+      type="number"
+      value={value}
+      onValueChange={setValue}
+      placeholder="Enter a number"
+    />
   );
 };
 
-export default App;
+export default NumberInput;
 ```
 
-### Handling File Inputs
+## Example of extend it to your custom form
 
 ```tsx
-import React, { useState } from "react";
-import { Input } from "@alfarizi/react-input";
+import * as React from "react";
 
-const App = () => {
-  const [file, setFile] = useState<File | undefined>(undefined);
+import { cn } from "@/lib/utils";
+import { type VariantProps, cva } from "class-variance-authority";
+import type * as InputPrimitive from "@alfarizi/react-input";
 
+export const inputVariants = cva(
+  "flex items-center h-10 w-full text-sm bg-transparent file:border-0 file:text-sm file:font-medium placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border border-transparent focus-within:outline-none aria-invalid:ring-1 aria-invalid:ring-destructive aria-invalid:focus-within:ring-2 aria-invalid:focus-within:ring-destructive",
+  {
+    variants: {
+      rounded: {
+        none: "rounded-none",
+        md: "rounded-md",
+      },
+      variant: {
+        outline:
+          "border-border focus-within:border-primary focus-within:shadow-[0_0px_0px_1px_hsl(var(--primary))] aria-invalid:border-transparent",
+        filled:
+          "border-2 bg-background focus-within:border-primary focus-within:bg-transparent",
+        underlined:
+          "rounded-none border-b-border focus-within:border-b-primary focus-within:shadow-[0_1px_0px_0px_hsl(var(--primary))]",
+        unstyled: "",
+      },
+    },
+    defaultVariants: {
+      rounded: "md",
+      variant: "outline",
+    },
+  },
+);
+
+export interface InputProps<
+  T extends InputPrimitive.InputType = "text",
+  M extends boolean | undefined = undefined,
+> extends InputPrimitive.InputProps<T, M>,
+    VariantProps<typeof inputVariants> {
+  containerClassName?: string;
+  startAdornment?: React.ReactNode;
+  endAdornment?: React.ReactNode;
+  startAdornmentClassName?: string;
+  endAdornmentClassName?: string;
+}
+
+const Input = <
+  T extends InputPrimitive.InputType = "text",
+  M extends boolean | undefined = undefined,
+>(
+  {
+    className,
+    containerClassName,
+    rounded,
+    variant,
+    type = "text" as T,
+    value,
+    startAdornment,
+    endAdornment,
+    startAdornmentClassName,
+    endAdornmentClassName,
+    ...props
+  }: InputProps<T, M>,
+  ref: React.Ref<HTMLInputElement>,
+) => {
   return (
-    <div>
-      <Input type="file" value={file} onValueChange={setFile} />
-    </div>
-  );
-};
-
-export default App;
-```
-
-### Handling Telephone Numbers
-
-```tsx
-import React, { useState } from "react";
-import { Input } from "@alfarizi/react-input";
-
-const App = () => {
-  const [telValue, setTelValue] = useState<string | undefined>("");
-
-  return (
-    <div>
-      <Input
-        type="tel"
-        value={telValue}
-        onValueChange={setTelValue}
-        placeholder="Enter a phone number"
+    <div
+      className={cn(
+        inputVariants({ variant, rounded, className: containerClassName }),
+        "relative flex items-center",
+      )}
+    >
+      {startAdornment && (
+        <div
+          className={cn(
+            "inline-flex h-full items-center text-muted-foreground",
+            "py-2 pl-3 pr-1.5",
+            "rounded-l-md has-[+input:focus]:rounded-l-sm has-[+input:focus]:border-l-0", // this must be same with default value of variant
+            {
+              "rounded-l-md": rounded === "md",
+              "rounded-l-none": rounded === "none",
+            },
+            startAdornmentClassName,
+          )}
+        >
+          {startAdornment}
+        </div>
+      )}
+      <input
+        ref={ref}
+        type={type}
+        value={
+          value !== undefined && value !== null
+            ? type === "file"
+              ? undefined
+              : type === "number"
+                ? String(value ?? "")
+                : (value as string)
+            : undefined
+        }
+        className={cn(
+          "w-full overflow-clip bg-transparent px-3 py-2 outline-none focus-visible:outline-none",
+          {
+            "pl-1.5": !!startAdornment,
+            "pr-1.5": !!endAdornment,
+          },
+          className,
+        )}
+        {...props}
       />
+      {endAdornment && (
+        <div
+          className={cn(
+            "inline-flex items-center text-muted-foreground",
+            "py-2 pl-1.5 pr-3",
+            "rounded-r-md has-[+input:focus]:rounded-r-sm has-[+input:focus]:border-r-0", // this must be same with default value of variant
+            {
+              "rounded-r-md": rounded === "md",
+              "rounded-r-none": rounded === "none",
+            },
+            endAdornmentClassName,
+          )}
+        >
+          {endAdornment}
+        </div>
+      )}
     </div>
   );
 };
 
-export default App;
+Input.displayName = "Input";
+
+export { Input };
+export default Input;
 ```
 
 ## Props
 
-| Prop Name       | Type                                          | Default     | Description                                                          |
-| --------------- | --------------------------------------------- | ----------- | -------------------------------------------------------------------- |
-| `type`          | `InputType`                                   | `"text"`    | The input type (e.g., `text`, `number`, `file`, etc.).               |
-| `value`         | `InputValue<T, M>`                            | `undefined` | The controlled value of the input.                                   |
-| `onValueChange` | `(value: InputValue<T, M>) => void`           | `undefined` | Callback triggered when the value changes.                           |
-| `multiple`      | `boolean`                                     | `undefined` | Determines if multiple files can be selected (only for `file` type). |
-| `...props`      | `React.InputHTMLAttributes<HTMLInputElement>` | -           | Additional input attributes.                                         |
+### InputProps
 
-## Development
-
-### Build the Package
-
-To build the package, run:
-
-```bash
-npm run build
-```
-
-### Run Tests
-
-To run tests, use:
-
-```bash
-npm test
-```
+| Name            | Type                                | Default     | Description                                        |
+| --------------- | ----------------------------------- | ----------- | -------------------------------------------------- |
+| `type`          | `InputType`                         | `"text"`    | The type of the input.                             |
+| `multiple`      | `boolean`                           | `false`     | Enables multiple file selection for `type="file"`. |
+| `value`         | `InputValue<T, M>`                  | `undefined` | The value of the input.                            |
+| `onValueChange` | `(value: InputValue<T, M>) => void` | `undefined` | Callback for when the value changes.               |
+| `trim`          | `boolean`                           | `true`      | Trims string inputs on blur or enter key press.    |
 
 ## License
 
-MIT License. See [LICENSE](./LICENSE) for more details.
+This project is licensed under the MIT License.

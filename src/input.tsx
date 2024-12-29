@@ -1,5 +1,3 @@
-"use client";
-
 import { convertToNumber } from "@alfarizi/convert-to-number";
 
 export type InputType =
@@ -40,7 +38,16 @@ export interface InputProps<
   multiple?: M;
   value?: InputValue<T, M>;
   onValueChange?: (value: InputValue<T, M>) => void;
+  trim?: boolean;
 }
+
+const trimValueBasedOnType: InputType[] = [
+  "text",
+  "email",
+  "tel",
+  "url",
+  "search",
+];
 
 const Input = <
   T extends InputType = "text",
@@ -52,6 +59,10 @@ const Input = <
     value,
     onValueChange,
     onChange,
+    trim = true,
+    // onSubmit,
+    onBlur,
+    onKeyDown,
     ...props
   }: InputProps<T, M>,
   ref: React.Ref<HTMLInputElement>,
@@ -76,15 +87,24 @@ const Input = <
       const isValidTel = /^[0-9\-+\s()]*$/.test(rawValue); // Allow digits, spaces, hyphens, plus, and parentheses
       if (isValidTel || rawValue === "") {
         onValueChange?.(
-          (rawValue.length > 0 ? rawValue : undefined) as InputValue<T, M>,
+          (rawValue.length !== 0 ? rawValue : undefined) as InputValue<T, M>,
         );
       }
     } else {
+      console.debug("ordinary string");
       onValueChange?.(
-        (rawValue.length > 0 ? rawValue : undefined) as InputValue<T, M>,
+        (rawValue.length !== 0 ? rawValue : undefined) as InputValue<T, M>,
       );
     }
   };
+
+  // React.useEffect(() => {
+  //   if (typeof value === "string" && trim && value.length === 0) {
+  //     onValueChange?.(undefined as InputValue<T, M>);
+  //   }
+  // }, [value, trim, onValueChange]);
+
+  console.log({ value });
 
   return (
     <input
@@ -101,8 +121,42 @@ const Input = <
               : type === "number"
                 ? String(value ?? "")
                 : (value as string)
-            : undefined
+            : ""
       }
+      onKeyDown={(e) => {
+        onKeyDown?.(e);
+        if (
+          e.key === "Enter" &&
+          trim &&
+          trimValueBasedOnType.includes(type) &&
+          typeof value === "string"
+        ) {
+          const trimValue = value.trim();
+          onValueChange?.(
+            (trimValue.length !== 0 ? trimValue : undefined) as InputValue<
+              T,
+              M
+            >,
+          );
+        }
+      }}
+      onBlur={(e) => {
+        onBlur?.(e);
+        if (
+          trim &&
+          trimValueBasedOnType.includes(type) &&
+          typeof value === "string"
+        ) {
+          const trimValue = value.trim();
+          console.debug({ trimValue });
+          onValueChange?.(
+            (trimValue.length !== 0 ? trimValue : undefined) as InputValue<
+              T,
+              M
+            >,
+          );
+        }
+      }}
       onChange={(e) => {
         handleChange(e);
         onChange?.(e);
