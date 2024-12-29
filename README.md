@@ -153,7 +153,9 @@ export default NumberInput;
 
 ## You want to Custom it? Yes you can
 
-Example of custom input component based on `@alfarizi/react-input`
+Example of custom input component based on `@alfarizi/react-input`. Result of
+this example custom input component can be seen here:
+<https://reactjs-components-five.vercel.app/?path=/docs/input--docs>
 
 ```tsx
 import * as React from "react";
