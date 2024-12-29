@@ -1,4 +1,5 @@
 import { convertToNumber } from "@alfarizi/convert-to-number";
+import React from "react";
 
 export type InputType =
   | "text"
@@ -49,122 +50,113 @@ const trimValueBasedOnType: InputType[] = [
   "search",
 ];
 
-const Input = <
-  T extends InputType = "text",
-  M extends boolean | undefined = undefined,
+const Input = React.forwardRef<
+  HTMLInputElement,
+  InputProps<InputType, boolean | undefined>
 >(
-  {
-    multiple,
-    type = "text" as T,
-    value,
-    onValueChange,
-    onChange,
-    trim = true,
-    // onSubmit,
-    onBlur,
-    onKeyDown,
-    ...props
-  }: InputProps<T, M>,
-  ref: React.Ref<HTMLInputElement>,
-) => {
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = event.target.value;
+  <T extends InputType = "text", M extends boolean | undefined = undefined>(
+    {
+      multiple,
+      type = "text" as T,
+      value,
+      onValueChange,
+      onChange,
+      trim = true,
+      onBlur,
+      onKeyDown,
+      ...props
+    }: InputProps<T, M>,
+    ref: React.Ref<HTMLInputElement>,
+  ) => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const rawValue = event.target.value;
 
-    if (type === "file") {
-      if (multiple) {
-        onValueChange?.(event.target.files as InputValue<T, M>);
+      if (type === "file") {
+        if (multiple) {
+          onValueChange?.(event.target.files as InputValue<T, M>);
+        } else {
+          const file = event.target.files?.[0] || null;
+          onValueChange?.(file as InputValue<T, M>);
+        }
+      } else if (type === "number") {
+        const parsedValue =
+          rawValue === ""
+            ? (undefined as any)
+            : convertToNumber(rawValue, undefined);
+        onValueChange?.(parsedValue as InputValue<T, M>);
+      } else if (type === "tel") {
+        const isValidTel = /^[0-9\-+\s()]*$/.test(rawValue);
+        if (isValidTel || rawValue === "") {
+          onValueChange?.(
+            (rawValue.length !== 0 ? rawValue : undefined) as InputValue<T, M>,
+          );
+        }
       } else {
-        const file = event.target.files?.[0] || null;
-        onValueChange?.(file as InputValue<T, M>);
-      }
-    } else if (type === "number") {
-      const parsedValue =
-        rawValue === ""
-          ? (undefined as any)
-          : convertToNumber(rawValue, undefined);
-      onValueChange?.(parsedValue as InputValue<T, M>);
-    } else if (type === "tel") {
-      const isValidTel = /^[0-9\-+\s()]*$/.test(rawValue); // Allow digits, spaces, hyphens, plus, and parentheses
-      if (isValidTel || rawValue === "") {
         onValueChange?.(
           (rawValue.length !== 0 ? rawValue : undefined) as InputValue<T, M>,
         );
       }
-    } else {
-      console.debug("ordinary string");
-      onValueChange?.(
-        (rawValue.length !== 0 ? rawValue : undefined) as InputValue<T, M>,
-      );
-    }
-  };
+    };
 
-  // React.useEffect(() => {
-  //   if (typeof value === "string" && trim && value.length === 0) {
-  //     onValueChange?.(undefined as InputValue<T, M>);
-  //   }
-  // }, [value, trim, onValueChange]);
-
-  console.log({ value });
-
-  return (
-    <input
-      ref={ref}
-      type={type}
-      value={
-        type === "tel"
-          ? value && /^[0-9\-+\s()]*$/.test(value as string)
-            ? (value as string)
-            : "" // If the value is invalid, render an empty string
-          : value !== undefined && value !== null
-            ? type === "file"
-              ? undefined
-              : type === "number"
-                ? String(value ?? "")
-                : (value as string)
-            : ""
-      }
-      onKeyDown={(e) => {
-        onKeyDown?.(e);
-        if (
-          e.key === "Enter" &&
-          trim &&
-          trimValueBasedOnType.includes(type) &&
-          typeof value === "string"
-        ) {
-          const trimValue = value.trim();
-          onValueChange?.(
-            (trimValue.length !== 0 ? trimValue : undefined) as InputValue<
-              T,
-              M
-            >,
-          );
+    return (
+      <input
+        ref={ref}
+        type={type}
+        value={
+          type === "tel"
+            ? value && /^[0-9\-+\s()]*$/.test(value as string)
+              ? (value as string)
+              : ""
+            : value !== undefined && value !== null
+              ? type === "file"
+                ? undefined
+                : type === "number"
+                  ? String(value ?? "")
+                  : (value as string)
+              : ""
         }
-      }}
-      onBlur={(e) => {
-        onBlur?.(e);
-        if (
-          trim &&
-          trimValueBasedOnType.includes(type) &&
-          typeof value === "string"
-        ) {
-          const trimValue = value.trim();
-          console.debug({ trimValue });
-          onValueChange?.(
-            (trimValue.length !== 0 ? trimValue : undefined) as InputValue<
-              T,
-              M
-            >,
-          );
-        }
-      }}
-      onChange={(e) => {
-        handleChange(e);
-        onChange?.(e);
-      }}
-      {...props}
-    />
-  );
-};
+        onKeyDown={(e) => {
+          onKeyDown?.(e);
+          if (
+            e.key === "Enter" &&
+            trim &&
+            trimValueBasedOnType.includes(type) &&
+            typeof value === "string"
+          ) {
+            const trimValue = value.trim();
+            onValueChange?.(
+              (trimValue.length !== 0 ? trimValue : undefined) as InputValue<
+                T,
+                M
+              >,
+            );
+          }
+        }}
+        onBlur={(e) => {
+          onBlur?.(e);
+          if (
+            trim &&
+            trimValueBasedOnType.includes(type) &&
+            typeof value === "string"
+          ) {
+            const trimValue = value.trim();
+            onValueChange?.(
+              (trimValue.length !== 0 ? trimValue : undefined) as InputValue<
+                T,
+                M
+              >,
+            );
+          }
+        }}
+        onChange={(e) => {
+          handleChange(e);
+          onChange?.(e);
+        }}
+        {...props}
+      />
+    );
+  },
+);
 
 Input.displayName = "Input";
 
