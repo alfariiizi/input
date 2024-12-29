@@ -151,7 +151,9 @@ const NumberInput = () => {
 export default NumberInput;
 ```
 
-## Example of extend it to your custom form
+## You want to Custom it? Yes you can
+
+Example of custom input component based on `@alfarizi/react-input`
 
 ```tsx
 import * as React from "react";
