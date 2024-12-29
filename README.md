@@ -157,6 +157,8 @@ Example of custom input component based on `@alfarizi/react-input`. Result of
 this example custom input component can be seen here:
 <https://reactjs-components-five.vercel.app/?path=/docs/input--docs>
 
+If you often use [shadcn-ui](https://ui.shadcn.com), you will love this custom component:
+
 ```tsx
 import * as React from "react";
 
