@@ -25,30 +25,6 @@ simplifies form handling with enhanced DX (Developer Experience).
 - **Tel Input**: Validates common phone number formats.
 - **Customizable**: Easily styled and extended.
 
-## Installation
-
-```bash
-npm install @alfarizi/react-input
-```
-
-or
-
-```bash
-yarn add @alfarizi/react-input
-```
-
-or
-
-```bash
-pnpm add @alfarizi/react-input
-```
-
-or
-
-```bash
-bun add @alfarizi/react-input
-```
-
 ## Motivation
 
 ### First Reason
@@ -105,6 +81,30 @@ prefer `undefined` over `null`, you can use my other package:
 [@alfarizi/convert-undefined-null](https://www.npmjs.com/package/@alfarizi/convert-undefined-null)
 to convert between `null` and `undefined`.
 
+## Installation
+
+```bash
+npm install @alfarizi/react-input
+```
+
+or
+
+```bash
+yarn add @alfarizi/react-input
+```
+
+or
+
+```bash
+pnpm add @alfarizi/react-input
+```
+
+or
+
+```bash
+bun add @alfarizi/react-input
+```
+
 ## Usage
 
 ### Basic Example
@@ -157,7 +157,8 @@ Example of custom input component based on `@alfarizi/react-input`. Result of
 this example custom input component can be seen here:
 <https://reactjs-components-five.vercel.app/?path=/docs/input--docs>
 
-If you often use [shadcn-ui](https://ui.shadcn.com), you will love this custom component:
+If you often use [shadcn-ui](https://ui.shadcn.com), you will love this custom
+component:
 
 ```tsx
 import * as React from "react";
