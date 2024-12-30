@@ -67,6 +67,10 @@ const InputComponent = <
   }: InputProps<T, M>,
   ref: React.ForwardedRef<HTMLInputElement>,
 ) => {
+  const isControlled =
+    (value !== undefined && onValueChange !== undefined) ||
+    (value !== undefined && onChange !== undefined);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = event.target.value;
 
@@ -95,6 +99,8 @@ const InputComponent = <
         (rawValue.length !== 0 ? rawValue : undefined) as InputValue<T, M>,
       );
     }
+
+    onChange?.(event);
   };
 
   return (
@@ -102,17 +108,19 @@ const InputComponent = <
       ref={ref}
       type={type}
       value={
-        type === "tel"
-          ? value && /^[0-9\-+\s()]*$/.test(value as string)
-            ? (value as string)
-            : ""
-          : value !== undefined && value !== null
-            ? type === "file"
-              ? undefined
-              : type === "number"
-                ? String(value ?? "")
-                : (value as string)
-            : ""
+        !isControlled
+          ? undefined
+          : type === "tel"
+            ? value && /^[0-9\-+\s()]*$/.test(value as string)
+              ? (value as string)
+              : ""
+            : value !== undefined && value !== null
+              ? type === "file"
+                ? undefined
+                : type === "number"
+                  ? String(value ?? "")
+                  : (value as string)
+              : ""
       }
       onKeyDown={(e) => {
         onKeyDown?.(e);
@@ -149,7 +157,6 @@ const InputComponent = <
       }}
       onChange={(e) => {
         handleChange(e);
-        onChange?.(e);
       }}
       {...props}
     />

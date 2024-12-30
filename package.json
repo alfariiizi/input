@@ -1,7 +1,7 @@
 {
   "name": "@alfarizi/react-input",
   "description": "React input component with typesafe \"type\" prop and \"value\" prop with introducing new props called \"onValueChange\" that can handle typesafe value change",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "author": "Moh Rizal Alfarizi",
   "license": "MIT",
   "keywords": [
